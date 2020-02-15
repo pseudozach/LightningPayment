@@ -1,4 +1,32 @@
 <?php
+function time_elapsed_string($datetime, $full = false) {
+    $now = new DateTime;
+    $ago = new DateTime($datetime);
+    $diff = $now->diff($ago);
+
+    $diff->w = floor($diff->d / 7);
+    $diff->d -= $diff->w * 7;
+
+    $string = array(
+        'y' => 'year',
+        'm' => 'month',
+        'w' => 'week',
+        'd' => 'day',
+        'h' => 'hour',
+        'i' => 'minute',
+        's' => 'second',
+    );
+    foreach ($string as $k => &$v) {
+        if ($diff->$k) {
+            $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+        } else {
+            unset($string[$k]);
+        }
+    }
+
+    if (!$full) $string = array_slice($string, 0, 1);
+    return $string ? implode(', ', $string) . ' ' : 'just now';
+}
 
 class BitcoinPayment {
 	public static function mtgox_check_post() {
@@ -12,6 +40,93 @@ class BitcoinPayment {
 		if (base64_decode($_SERVER['HTTP_REST_SIGN']) != $hash) return false;
 
 		return true;
+	}
+
+	public static function getInvoiceByLabel($label)
+    {
+	global $wgBitcoinPaymentNodeUrl;
+        $params = http_build_query([
+            "method" => "listinvoices",
+            "label" => $label,
+        ]);
+        
+	$ret = file_get_contents($wgBitcoinPaymentNodeUrl . "/?" . $params);
+        return json_decode($ret);
+	}
+
+
+    public static function createInvoice($msatoshi, $label, $description)
+    {
+	global $wgBitcoinPaymentNodeUrl;
+        $params = http_build_query([
+            "method" => "invoice",
+            "msatoshi" => $msatoshi, 
+            "label" => $label,
+            "description" => $description,
+        ]);
+        
+        $ret = file_get_contents($wgBitcoinPaymentNodeUrl . "/?" . $params);
+        return json_decode($ret);
+    }
+
+	public static function generateLabel($wgUserId)
+	{
+		$rand = rand(0, 9999999);
+		$label = 'wiki-pay|' . $wgUserId . '|' . $rand;
+		return $label;
+		
+	}
+
+	public static function getInvoice($wgUserId, $invoiceId)
+	{
+		if (empty($invoiceId)) {
+			$label = self::generateLabel($wgUserId);
+		} else {
+			$label = $invoiceId;
+		}
+		$desc = 'Anti-spam payment for wiki';
+
+		$ret = self::getInvoiceByLabel($label);
+
+		if (count($ret->result->invoices) == 0) {
+			$ret = self::createInvoice(1000, $label, $desc);
+//			var_dump($ret);
+			$bolt11 = $ret->result->bolt11;
+			$paid = false;
+			$expiry = $ret->result->expires_at;
+			$expired = false;
+		} else {
+//			var_dump($ret);
+			$bolt11 = $ret->result->invoices[0]->bolt11;
+			$paid = $ret->result->invoices[0]->status == 'paid';
+			$expiry = $ret->result->invoices[0]->expires_at;
+			$expired = $ret->result->invoices[0]->status == 'expired';
+		}
+
+		if ($expired) {
+			$label = self::generateLabel($wgUserId);
+			$ret = self::createInvoice(1000, $label, $desc);
+//var_dump($ret);
+			$bolt11 = $ret->result->bolt11;
+			$paid = false;
+			$expiry = $ret->result->expires_at;
+			$expired = false;
+		}
+
+		$invoice = [
+			'expiry' => time_elapsed_string("@$expiry"),
+			'invoiceId' => $label,
+			'bolt11' => $bolt11,
+		];
+
+		return $invoice;
+
+var_dump(date("Y-m-d H:i:s", $expiry));
+var_dump(date("Y-m-d H:i:s"));
+var_dump(date_default_timezone_get());
+var_dump($invoice);
+		echo "X";
+die;	
 	}
 
 	public static function mtgox_query($path, array $req = array()) {

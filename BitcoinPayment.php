@@ -1,4 +1,11 @@
 <?php
+$wgMainCacheType = CACHE_NONE;
+$wgCacheDirectory = false;
+
+ini_set('display_errors', true);
+error_reporting(E_ALL | E_STRICT);
+
+
 
 if ( !defined( 'MEDIAWIKI' ) )
 	exit(1);
