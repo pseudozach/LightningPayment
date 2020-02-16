@@ -1,0 +1,12 @@
+LightningPayment is the wiki's automated anti-spam protection mechanism.  A small one-time Bitcoin payment (using the Lightning Network) is required before a user is allowed to edit or create pages.  While the payment is deliberately small for a normal user, it presents a barrier to a mass-spammer.  Funds sent to this wiki will be used to keep the wiki online (cost of domain name and hosting), and remaining funds will be used to support Bitcoin and Lightning Network development.
+
+See [[LightningPayment]] for more info.
+
+== Status ==
+
+{{#ifeq: {{{status}}} | todo | To receive editing rights, you will need to send 1 satoshi to the given lightning invoice. }}
+
+{{#ifeq: {{{status}}} | done | Thank you for your support! }}
+
+{{#ifeq: {{{status}}} | nologin | You'll need to login to know your status. }}
+
