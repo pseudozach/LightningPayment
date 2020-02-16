@@ -7,7 +7,7 @@ $wgExtensionCredits['antispam'][] = array(
     'path' => __FILE__,
     'name' => 'LightningPayment',
     'author' => 'Tim Horie',
-    'url' => 'https://en.bitcoin.it/wiki/LightningPayment',
+    'url' => 'https://wiki.for-bitcoin.com/wiki/LightningPayment',
     'descriptionmsg' => 'lightningpayment-desc',
     'version' => '0.1.0',
 );

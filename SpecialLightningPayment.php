@@ -16,31 +16,9 @@ class SpecialLightningPayment extends SpecialPage {
         $user->addGroup('trusted');
     }
 
-    public function execute($par) {
+    public function execute($subPage) {
         global $wgUser;
         global $wgLightningPaymentApiKey;
-
-
-        if (!empty($_POST) && isset($_POST['key'])) {
-
-            // Validate API key
-            if (trim($_POST['key']) !== $wgLightningPaymentApiKey) {
-                echo 'Bad key';
-                die;
-            }
-
-            $userId = intval($_POST['wgUserId']);
-
-            if (false === $userId > 0) {
-                echo 'Bad userId';
-                die;
-            }
-
-            $user = User::newFromId($userId);
-            $user->addGroup('trusted');
-
-            return;
-        }
 
         $request = $this->getRequest();
         $output = $this->getOutput();
@@ -61,47 +39,44 @@ class SpecialLightningPayment extends SpecialPage {
             return;
         }
 
-        $lightning_addr = $wgUser->getOption('lightningpayment-addr');
         $invoiceId = $wgUser->getOption('invoice-id');
+    
+        $ret = LightningPayment::getInvoice($wgUser->getId(), $invoiceId);
 
-        if (true || is_null($lightning_addr)) {
-//			$url = 'http'.(isset($_SERVER['HTTPS'])?'s':'').'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-            //			$url = 'https://'.$_SERVER['HTTP_HOST'].'/wiki/Special:LightningPayment/callback';
-            //
-			//
-			$ret = LightningPayment::getInvoice($wgUser->getId(), $invoiceId);
-
-            $addr = $ret['bolt11'];
-
-            $lightning_addr = ['result' => 'success', 'data' => ['addr' => $addr]]; //LightningPayment::mtgox_query('2/money/lightning/address', array('ipn' => $url, 'description' => 'WP#'.$wgUser->getId()));
-            if ($lightning_addr['result'] != 'success') {
-                $wikitext = 'An error occured, please retry later';
-                $output->addWikiText($wikitext);
-                return;
-            }
-
-            if ($ret['status'] == 'paid') {
-                $this->grantTrusted($wgUser->getId());
-                $wikitext = 'Payment detected! You are now trusted, thank you!';
-                $wikitext .= "\n\n{{LightningPayment|status=done}}";
-                $output->addWikiTextAsInterface($wikitext);
-                return;
-            }
-
-            $lightning_addr = $lightning_addr['data']['addr'];
-            $wgUser->setOption('invoice-id', $ret['invoiceId']);
-            $wgUser->setOption('lightningpayment-addr', $lightning_addr);
-            $wgUser->saveSettings();
+        if (!isset($ret['bolt11'])) {
+            $wikitext = 'An error occured, please retry later';
+            $output->addWikiText($wikitext);
+            return;
         }
 
-        $wikitext = 'In order to be able to edit pages on this wiki, you will need to send a payment of 1 satoshi to the lightning invoice: ' .
-                '<div style="overflow:wrap;word-break:break-all">' . $lightning_addr . '</div> ' .
-                '<p><img src="https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=lightning:' . $lightning_addr . '"></p>' .
-                '<p>[lightning:' . $lightning_addr . ' ' . '(open in wallet)] expires in ' . $ret['expiry'] . '</p>';
-        $wikitext .= "\n\n";
-        $wikitext .= 'Please note that you will need to wait for your transfer to be confirmed. Once payment has been sent, please refresh this page to check if the payment was detected.';
-        $wikitext .= "\n\n{{LightningPayment|status=todo|addr=$lightning_addr}}";
+        if ($ret['status'] == 'paid') {
+            $this->grantTrusted($wgUser->getId());
+            $wikitext = 'Payment detected! You are now trusted, thank you!';
+            $wikitext .= "\n\n{{LightningPayment|status=done}}";
+            $output->addWikiTextAsInterface($wikitext);
+            return;
+        }
 
+        $wgUser->setOption('invoice-id', $ret['invoiceId']);
+        $wgUser->saveSettings();
+//        
+        $wikitext = <<<EOT
+In order to be able to edit pages on this wiki, you will need to send a payment of 1 satoshi to the lightning invoice: 
+<div style="overflow:wrap;word-break:break-all">{$ret['bolt11']}</div> 
+<p>
+    <img src="https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=lightning:{$ret['bolt11']}">
+</p>
+<p>
+    [lightning:{$ret['bolt11']} (open in wallet)]
+    expires in {$ret['expiry']}
+</p>
+<p>
+    Please note that you will need to wait for your transfer to be confirmed. 
+    Once payment has been sent, please refresh this page to check if the payment was detected.
+</p>
+<p>{{LightningPayment|status=todo|addr={$ret['bolt11']}}}</p>
+\n\n
+EOT;
         $output->addWikiTextAsInterface($wikitext);
     }
 
