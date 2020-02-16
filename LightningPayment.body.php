@@ -28,7 +28,7 @@ function time_elapsed_string($datetime, $full = false) {
     return $string ? implode(', ', $string) . ' ' : 'just now';
 }
 
-class BitcoinPayment {
+class LightningPayment {
 	public static function mtgox_check_post() {
 		// API settings
 		$key = 'your_key';
@@ -44,20 +44,20 @@ class BitcoinPayment {
 
 	public static function getInvoiceByLabel($label)
     {
-	global $wgBitcoinPaymentNodeUrl;
+	global $wgLightningPaymentNodeUrl;
         $params = http_build_query([
             "method" => "listinvoices",
             "label" => $label,
         ]);
         
-	$ret = file_get_contents($wgBitcoinPaymentNodeUrl . "/?" . $params);
+	$ret = file_get_contents($wgLightningPaymentNodeUrl . "/?" . $params);
         return json_decode($ret);
 	}
 
 
     public static function createInvoice($msatoshi, $label, $description)
     {
-	global $wgBitcoinPaymentNodeUrl;
+	global $wgLightningPaymentNodeUrl;
         $params = http_build_query([
             "method" => "invoice",
             "msatoshi" => $msatoshi, 
@@ -65,7 +65,7 @@ class BitcoinPayment {
             "description" => $description,
         ]);
         
-        $ret = file_get_contents($wgBitcoinPaymentNodeUrl . "/?" . $params);
+        $ret = file_get_contents($wgLightningPaymentNodeUrl . "/?" . $params);
         return json_decode($ret);
     }
 
@@ -95,12 +95,14 @@ class BitcoinPayment {
 			$paid = false;
 			$expiry = $ret->result->expires_at;
 			$expired = false;
+                        $status = 'unpaid';
 		} else {
 //			var_dump($ret);
 			$bolt11 = $ret->result->invoices[0]->bolt11;
 			$paid = $ret->result->invoices[0]->status == 'paid';
 			$expiry = $ret->result->invoices[0]->expires_at;
 			$expired = $ret->result->invoices[0]->status == 'expired';
+                        $status = $ret->result->invoices[0]->status;
 		}
 
 		if ($expired) {
@@ -117,6 +119,7 @@ class BitcoinPayment {
 			'expiry' => time_elapsed_string("@$expiry"),
 			'invoiceId' => $label,
 			'bolt11' => $bolt11,
+                        'status' => $status,
 		];
 
 		return $invoice;
