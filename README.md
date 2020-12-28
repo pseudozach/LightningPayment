@@ -6,18 +6,13 @@ Requirements
 ------------
 
 The system requires either:
-1. A c-lightning node with the [lightning-charge](https://github.com/ElementsProject/lightning-charge) configured and installed.
-2. [lnbits.com](https://lnbits.com) account
+* A c-lightning node with the [lightning-charge](https://github.com/ElementsProject/lightning-charge) configured and installed.
+* [lnbits.com](https://lnbits.com) account
 
 Installation
 ------------
 
-Copy the files to the `extensions/LightningPayment` folder.
-
-You will need a "LightningPayment" template. You can create it by copying
-the contents of the Template:LightningPayment.txt file into your wiki like:
-
-http://127.0.0.1:8080/index.php?title=Template:LightningPayment&action=edit
+Copy the files to the `extensions/LightningPayment` folder on the mediawiki server/docker (e.g. /var/www/html/extensions/)
 
 
 Configuration
@@ -27,11 +22,11 @@ Add these settings to the bottom of the LocalSettings.php file.
 * You need to set the LightningBackend you are using and configure it: lightningcharge or lnbits.
 
 * For [lightning-charge](https://github.com/ElementsProject/lightning-charge) 
-⋅⋅* Set $wgLightningPaymentNodeUrl to lightning-charge api endpoint where mediawiki server can access it.
-⋅⋅* Set $wgLightningPaymentNodeUrl to lightning-charge api endpoint where mediawiki server can access it.
+  * Set $wgLightningPaymentNodeUrl to lightning-charge api endpoint where mediawiki server can access it.
+  * Set $wgLightningPaymentApiToken to your lightning-charge api token.
 
 * For [lnbits.com](https://lnbits.com) 
-⋅⋅* Set $wgLNBitsApiKey to "Invoice/read key" from your lnbits wallet dashboard.
+  * Set $wgLNBitsApiKey to "Invoice/read key" from your lnbits wallet dashboard.
 
 
 ```
