@@ -6,7 +6,7 @@ Requirements
 ------------
 
 The system requires either:
-* A c-lightning node with the [lightning-charge](https://github.com/ElementsProject/lightning-charge) configured and installed.
+* A [c-lightning](https://github.com/ElementsProject/lightning) node with [lightning-charge](https://github.com/ElementsProject/lightning-charge) configured and installed.
 * [lnbits.com](https://lnbits.com) account
 
 Installation
@@ -72,4 +72,12 @@ It should display a lightning invoice and QR code image.
 Newly created accounts won't be able to edit until they have paid.
 
 Refresh the page after payment and user will have edit rights.
+
+Demo
+-----
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=J_P0SfQS5Gs" target="_blank"><img src="http://img.youtube.com/vi/J_P0SfQS5Gs/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
+
+
 
