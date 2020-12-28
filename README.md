@@ -76,7 +76,7 @@ Refresh the page after payment and user will have edit rights.
 Demo
 -----
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=J_P0SfQS5Gs" target="_blank"><img src="http://img.youtube.com/vi/J_P0SfQS5Gs/0.jpg" 
+<a target="_blank" href="http://www.youtube.com/watch?feature=player_embedded&v=J_P0SfQS5Gs"><img src="http://img.youtube.com/vi/J_P0SfQS5Gs/0.jpg" 
 alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
 
 

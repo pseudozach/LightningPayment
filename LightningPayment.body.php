@@ -222,12 +222,9 @@ class LightningPayment {
         if (!empty($invoiceId)) {
             $ret = self::getInvoiceByLabel($label);   
         }
-        
-        // || count($ret->result->invoices) == 0
+
         if (empty($ret) || $ret == "Not Found" || $ret == "" || $ret == "false") {
             $ret = self::createInvoice(1000, $label, $desc);
-            // $bolt11 = $ret->result->bolt11;
-            // $retjson = json_decode($ret, true);
 
             switch ($wgLightningBackend) {
                 case 'lnbits':
@@ -251,9 +248,6 @@ class LightningPayment {
                     break;
             }
 
-            // $bolt11 = $ret->result->payreq;
-            // $expiry = $ret->result->expires_at;
-            // $id = $ret->result->id;
             $status = 'unpaid';
         } else {
             // there's an existing invoice for this user!
@@ -310,6 +304,5 @@ class LightningPayment {
         ];
 
         return $invoice;
-        // return $ret;
     }
 }
