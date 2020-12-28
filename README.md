@@ -5,7 +5,9 @@ This simple plugin allows users to join the mediawiki group "trusted" by paying.
 Requirements
 ------------
 
-The system requires a c-lightning node with the lightning-php API configured and installed.
+The system requires either:
+1. A c-lightning node with the [lightning-charge](https://github.com/ElementsProject/lightning-charge) configured and installed.
+2. [lnbits.com](https://lnbits.com) account
 
 Installation
 ------------
@@ -21,7 +23,16 @@ http://127.0.0.1:8080/index.php?title=Template:LightningPayment&action=edit
 Configuration
 -------------
 
-Add these settings to the bottom of the LocalSettings.php file. Be sure to change `$wgBitcoinPaymentNodeUrl` to the URL of the c-lightning php api. If you are using a remote server, there is an example of using stunnel4 to create a certificate-based connection between your wiki and the lightning node available in the mediawiki-docker-lightning repo.
+Add these settings to the bottom of the LocalSettings.php file.
+* You need to set the LightningBackend you are using and configure it: lightningcharge or lnbits.
+
+* For [lightning-charge](https://github.com/ElementsProject/lightning-charge) 
+⋅⋅* Set $wgLightningPaymentNodeUrl to lightning-charge api endpoint where mediawiki server can access it.
+⋅⋅* Set $wgLightningPaymentNodeUrl to lightning-charge api endpoint where mediawiki server can access it.
+
+* For [lnbits.com](https://lnbits.com) 
+⋅⋅* Set $wgLNBitsApiKey to "Invoice/read key" from your lnbits wallet dashboard.
+
 
 ```
 wfLoadExtension( 'ParserFunctions' );
@@ -34,10 +45,18 @@ $wgGroupPermissions['*']['createpage'] = false;
 $wgGroupPermissions['user']['createpage'] = false;
 $wgGroupPermissions['trusted']['createpage'] = true;
 
-$wgBitcoinPaymentApiKey = 'aaaaaabbbbbbbccccccc111';
-$wgBitcoinPaymentNodeUrl = 'http://ln-gateway:3000';
-#$wgMainCacheType = CACHE_NONE;
-#$wgCacheDirectory = false;
+#choose one backend implementation: lightningcharge OR lnbits
+$wgLightningBackend = 'lnbits';
+//$wgLightningBackend = 'lightningcharge';
+
+#c-lightning & lightning-charge
+$wgLightningPaymentApiToken = 'mySecretToken';
+$wgLightningPaymentNodeUrl = 'http://host.docker.internal:9112';
+
+#lnbits
+$wgLNBitsUrl = 'https://lnbits.com';
+$wgLNBitsApiKey = 'lnbitsapikey';
+
 #$wgShowExceptionDetails = true;
 
 $wgUrlProtocols[] = 'lightning:';
@@ -56,3 +75,6 @@ http://localhost:8080/index.php/Special:LightningPayment
 It should display a lightning invoice and QR code image.
 
 Newly created accounts won't be able to edit until they have paid.
+
+Refresh the page after payment and user will have edit rights.
+

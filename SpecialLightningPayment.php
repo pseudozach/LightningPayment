@@ -44,12 +44,15 @@ class SpecialLightningPayment extends SpecialPage {
         $ret = LightningPayment::getInvoice($wgUser->getId(), $invoiceId);
 
         if (!isset($ret['bolt11'])) {
+            $arrtext = implode(" ",$ret);
             $wikitext = 'An error occured, please retry later';
-            $output->addWikiText($wikitext);
+            // $output->addWikiText($wikitext);
+            $wikitext = $arrtext;
+            $output->addWikiTextAsInterface($wikitext);
             return;
         }
 
-        if ($ret['status'] == 'paid') {
+        if ($ret['status'] == 'paid' || $ret['status'] == 1) {
             $this->grantTrusted($wgUser->getId());
             $wikitext = 'Payment detected! You are now trusted, thank you!';
             $wikitext .= "\n\n{{LightningPayment|status=done}}";
