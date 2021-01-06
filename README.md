@@ -6,14 +6,21 @@ Requirements
 ------------
 
 The system requires either:
-* A [c-lightning](https://github.com/ElementsProject/lightning) node with [lightning-charge](https://github.com/ElementsProject/lightning-charge) configured and installed.
+* [c-lightning](https://github.com/ElementsProject/lightning) node with [lightning-charge](https://github.com/ElementsProject/lightning-charge) configured and installed.
 * [lnbits.com](https://lnbits.com) account
+
+* This extension requires ParserFunctions extension, so if you don't already have it:
+  * Download it from [here](https://www.mediawiki.org/wiki/Special:ExtensionDistributor/ParserFunctions)
+  * Place it to your `extensions/` folder on the mediawiki server/docker.
 
 Installation
 ------------
 
-Copy the files to the `extensions/LightningPayment` folder on the mediawiki server/docker (e.g. /var/www/html/extensions/)
-
+* Copy files from this repository to `extensions/LightningPayment` folder on the mediawiki server/docker (e.g. /var/www/html/extensions/)
+```
+git clone https://github.com/pseudozach/LightningPayment.git
+docker cp LightningPayment <containerid>:/var/www/html/extensions/
+```
 
 Configuration
 -------------
