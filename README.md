@@ -6,13 +6,13 @@ Requirements
 ------------
 
 The system requires either:
-* A [c-lightning](https://github.com/ElementsProject/lightning) node with [lightning-charge](https://github.com/ElementsProject/lightning-charge) configured and installed.
-* [lnbits.com](https://lnbits.com) account
+* A [c-lightning](https://github.com/ElementsProject/lightning) node with [lightning-charge](https://github.com/ElementsProject/lightning-charge) configured and installed or
+* an [lnbits.com](https://lnbits.com) account.
 
 Installation
 ------------
 
-Copy the files to the `extensions/LightningPayment` folder on the mediawiki server/docker (e.g. /var/www/html/extensions/)
+Copy the files to the `extensions/LightningPayment` folder on the mediawiki server/docker (e.g. /var/www/html/extensions/) or, while your working directory is the `extensions` folder, clone the project with `git clone https://github.com/pseudozach/LightningPayment.git`
 
 
 Configuration
