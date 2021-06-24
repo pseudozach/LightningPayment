@@ -1,4 +1,4 @@
-# LightningPayment
+# Lightning Payment
 
 This simple plugin allows users to join the mediawiki group "trusted" by paying.
 
