@@ -1,63 +1,63 @@
 <?php
 
-class SpecialLightningPayment extends SpecialPage {
+ SpecialLightningPayment extends SpecialPage {
 
-    public function __construct() {
+      __construct() {
         parent::__construct('LightningPayment');
     }
 
-    public function grantTrusted($wgUserId) {
+     grantTrusted($wgUserId) {
 
-        if (false === $wgUserId > 0) {
-            throw new \Exception('Bad userId');
+         (false === $wgUserId > 0) {
+                \Exception('Bad userId');
         }
 
         $user = User::newFromId($wgUserId);
         $user->addGroup('trusted');
     }
 
-    public function execute($subPage) {
-        global $wgUser;
-        global $wgLightningPaymentApiKey;
+            execute($subPage) {
+         $wgUser;
+         $wgLightningPaymentApiKey;
 
         $request = $this->getRequest();
         $output = $this->getOutput();
         $this->setHeaders();
 
-        if ($wgUser->isAnon()) {
+         ($wgUser->isAnon()) {
             $wikitext = 'You need to [[Special:UserLogin|login]] to access this page';
             $wikitext .= "\n\n{{LightningPayment|status=nologin}}";
             $output->addWikiTextAsInterface($wikitext);
-            return;
+            ;
         }
 
         $groups = $wgUser->getGroups();
-        if (array_search('trusted', $groups) !== false) {
+         (array_search('trusted', $groups) !== false) {
             $wikitext = 'You are already trusted, thank you!';
             $wikitext .= "\n\n{{LightningPayment|status=done}}";
             $output->addWikiTextAsInterface($wikitext);
-            return;
+            ;
         }
 
         $invoiceId = $wgUser->getOption('invoice-id');
     
         $ret = LightningPayment::getInvoice($wgUser->getId(), $invoiceId);
 
-        if (!isset($ret['bolt11'])) {
+         (!isset($ret['bolt11'])) {
             $arrtext = implode(" ",$ret);
             $wikitext = 'An error occured, please retry later';
             // $output->addWikiText($wikitext);
             $wikitext = $arrtext;
             $output->addWikiTextAsInterface($wikitext);
-            return;
+            ;
         }
 
-        if ($ret['status'] == 'paid' || $ret['status'] == 1) {
+         ($ret['status'] == 'paid' || $ret['status'] == 1) {
             $this->grantTrusted($wgUser->getId());
             $wikitext = 'Payment detected! You are now trusted, thank you!';
             $wikitext .= "\n\n{{LightningPayment|status=done}}";
             $output->addWikiTextAsInterface($wikitext);
-            return;
+            ;
         }
 
         $wgUser->setOption('invoice-id', $ret['invoiceId']);
